@@ -17,7 +17,7 @@ UserRouter.post('/new', async (req, res) => {
             return null
         }
 
-        if(!Email || !Username || !Password) return res.status(400).json({message:"please fill required fields"})
+        if (!Email || !Username || !Password) return res.status(400).json({ message: "please fill required fields" })
 
         const registeruser = new User({
             Email, Username, Password
@@ -35,18 +35,33 @@ UserRouter.put('/:_id', async (req, res) => {
     try {
 
         const { _id } = req.params;
-        const update=req.body;
-        const findAndUpd = await User.findOneAndUpdate({_id},update,{new:true});
+        const update = req.body;
+        const findAndUpd = await User.findOneAndUpdate({ _id }, update, { new: true });
         if (!findAndUpd) {
             res.status(404).json({ messge: "Failed to updated User" + _id });
         }
         res.status(200).json({ messge: "Succsessfully updated User" + _id });
-        
+
     } catch (error) {
-        res.status(500).json({ messge: `${error}`,user:findAndUpd })
+        res.status(500).json({ messge: `${error}`, user: findAndUpd })
     }
 })
 export default UserRouter;
 
+UserRouter.post('/login', async (req, res) => {
+  try {
+      const { Email, Password } = req.body;
+    const isexisting = await User.findOne({Email})
+    if (!isexisting) {
+        return res.status(404).json({ message: "this email is not found" })
+    }
+    if(Password!==isexisting.Password){
+      return  res.status(404).json({message:"your password is wrong please trt again"})
+    }
+    res.status(200).json(isexisting)
+  } catch (error) {
+    res.status(500).json(`error occuring in ${error}`)
+  }
+})
 
 
