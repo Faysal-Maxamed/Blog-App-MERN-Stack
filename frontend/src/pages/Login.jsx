@@ -1,8 +1,10 @@
 import React from 'react'
+import { useEffect } from 'react';
 import { useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { useUser } from '../hooks/useUser';
 function Login() {
 
   const EndPoint = "http://localhost:4000/api/users/login";
@@ -10,6 +12,16 @@ function Login() {
     Email: "",
     Password: ""
   });
+   const navigate = useNavigate("");
+
+  const {Logging,user,Logout}=useUser();
+  
+  useEffect(()=>{
+    console.log("InfoUserhhh",user)
+    if(user) 
+      navigate('/about')
+  },
+[user])
 
   const HandleOnChange = (event) => {
     console.log(event.target.value)
@@ -18,22 +30,24 @@ function Login() {
       [event.target.id]: event.target.value
     })
   }
-  const navigate = useNavigate("");
+ 
+  
   const HandleSubmit = async (event) => {
     event.preventDefault();
     try {
-      var response = await axios.post(EndPoint, formdate);
-      navigate("/");
+      var {data} = await axios.post(EndPoint, formdate);
       toast.success("Succsessfully login Welcome Mr" +formdate.Email)
+      console.log(data);
+      Logging(data,data.expireIn)
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error?.response?.data?.message   )
       console.log(error)
     }
   }
   return (
     <div className='h-screen bg-gray-100 flex justify-center items-center'>
       <div className='bg-white rounded-md shadow-md w-88   flex flex-col py-8 items-center'>
-        <h1 className='text-2xl font-regular italic mb-4'>Register here</h1>
+        <h1 className='text-2xl font-regular italic mb-4'>login here</h1>
         <form onSubmit={HandleSubmit} action="" >
           <div className='w-80 flex flex-col justify-center '>
             <label className='text-gray-400' >Email</label>

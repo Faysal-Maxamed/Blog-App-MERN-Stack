@@ -5,7 +5,8 @@ import App from './App.jsx';
 import About from './pages/About.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import {Toaster} from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
+import UseContext, { UserProvider } from './hooks/useUser.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -30,8 +31,10 @@ const router = createBrowserRouter([
 // isticmaal ReactDOM.createRoot sidaan:
 ReactDOM.createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <Toaster/>
-   <RouterProvider router={router}/>
+    <UserProvider>
+      <Toaster />
+      <RouterProvider router={router} />
+    </UserProvider>
   </StrictMode>
 );
 

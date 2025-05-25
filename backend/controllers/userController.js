@@ -1,6 +1,9 @@
 import User from "../models/User.js";
 import express from 'express';
+import jwt from 'jsonwebtoken';
 const UserRouter = express.Router();
+
+export const secret ="SDKMALLAJDMDJILELANKMCMH08JNSGAAAAAAAAABBBBBBBBBBBBUYYY88999OMA";
 
 UserRouter.get('/', async (req, res) => {
     const fetcUser = await User.findOne();
@@ -52,13 +55,27 @@ UserRouter.post('/login', async (req, res) => {
   try {
       const { Email, Password } = req.body;
     const isexisting = await User.findOne({Email})
+    if(!Email || !Password) {
+        return res.status(404).json({message:"Please Enter Your Email and password"})
+    }
     if (!isexisting) {
         return res.status(404).json({ message: "this email is not found" })
     }
     if(Password!==isexisting.Password){
       return  res.status(404).json({message:"your password is wrong please trt again"})
     }
-    res.status(200).json(isexisting)
+    const expireIn=7*24*60*60;
+    const token =jwt.sign({_id:isexisting._id},secret,{expiresIn:expireIn});
+
+    res.cookie('token',token,{
+        secure:false,
+        httpOnly:true,
+        maxAge:expireIn*1000
+    })
+
+    isexisting.Password=undefined;
+    
+    res.status(200).send({...isexisting.toJSON(),expireIn})
   } catch (error) {
     res.status(500).json(`error occuring in ${error}`)
   }
